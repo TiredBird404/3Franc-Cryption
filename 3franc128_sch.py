@@ -30,7 +30,7 @@ class Cryption:
     
     def decryption(self) -> tuple[bool, str]:
         try:
-            hex_text : str = StringProcessor(self.text).hex_only()
+            hex_text : str = StringProcessor(self.text).clean_space()
 
             salt : bytes = bytes.fromhex(hex_text[:self.salt_length*2])
             mac : str = hex_text[-self.mac_length*2:]
@@ -84,11 +84,6 @@ class StringProcessor:
     
     def clean_space(self) -> str: # 清除字符串的空白字符
         return ''.join(self.string.split())
-
-    def hex_only(self) -> str: # 清除文本中所有非十六进制的字符
-        hex_chars : str = '0123456789abcdef'
-        low_text : str = self.string.lower()
-        return ''.join([c for c in low_text if c in hex_chars])
 
     def compress(self) -> str: # 压缩字符串，并输出十六进制文本
         data : bytes = self.string.encode('utf-8')
