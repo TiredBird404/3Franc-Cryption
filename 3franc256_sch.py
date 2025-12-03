@@ -57,9 +57,7 @@ class Cryption:
         len_text : int = len(bytes_text)
         derived_key : bytes = hashlib.shake_256(key).digest(len_text) # 将密钥派生至让每一个字节都有几乎随机的值
 
-        result = bytearray(len_text)
-        for i in range(len_text):
-            result[i] = bytes_text[i] ^ derived_key[i]
+        result = bytearray(a ^ b for a, b in zip(bytes_text, derived_key))
 
         return bytes(result).hex()
 
@@ -91,13 +89,7 @@ class StringProcessor:
 
     def hex_only(self) -> str: # 清除文本中所有非十六进制的字符
         hex_chars : str = '0123456789abcdef'
-        result : list[str] = []
-        for c in self.string.lower():
-            if c in hex_chars:
-                result.append(c)
-            else: 
-                continue
-        return ''.join(result)
+        return ''.join([c for c in self.string.lower() if c in hex_chars])
 
     def compress(self) -> str: # 压缩字符串，并输出十六进制文本
         data : bytes = self.string.encode('utf-8')
@@ -110,32 +102,19 @@ class StringProcessor:
         return decompressed_data.decode("utf-8")
     
     def intersect(self) -> str: # 将文本交叉。例：abcdef -> bdface
-        text : str = self.string
-        result : list[str] = []
-        for i in range(1,len(text),2):
-            result.append(text[i])
-        for n in range(0,len(text),2):
-            result.append(text[n])
-        return ''.join(result)
+        odd_chars : str = self.string[1::2]
+        even_chars : str = self.string[::2]
+        return odd_chars + even_chars
     
     def reverse_intersect(self) -> str: # 该逆向适用于偶数长度的文本，因为导入的十六进制字符串是bytes长度*2，所以其必然是偶数
         text : str = self.string
         half_len : int = len(text) // 2
-        first : str = text[:half_len]
-        second : str = text[half_len:]
-        result : list[str] = []
-        for i in range(half_len):
-            result.append(second[i])
-            result.append(first[i])
-        return ''.join(result)
+        even_chars : str = text[:half_len]
+        odd_chars : str = text[half_len:]
+        return ''.join([second_char + first_char for second_char, first_char in zip(odd_chars, even_chars)])
     
-    def change_line(self,line : int) -> str: # 每隔n个字符换行
-        result : list[str] = []
-        for i, char in enumerate(self.string):
-            result.append(char)
-            if (i + 1) % line == 0:
-                result.append('\n')
-        return ''.join(result)
+    def change_line(self, line : int) -> str: # 每隔n个字符换行
+        return ''.join([char + ('\n' if (i + 1) % line == 0 else '') for i, char in enumerate(self.string)])
 
 class UIManager:
     def __init__(self, root : tk.Tk) -> None:
