@@ -57,9 +57,7 @@ class Cryption:
         len_text : int = len(bytes_text)
         derived_key : bytes = hashlib.shake_256(key).digest(len_text) # 将密钥派生至让每一个字节都有几乎随机的值
 
-        result = bytearray(a ^ b for a, b in zip(bytes_text, derived_key))
-
-        return bytes(result).hex()
+        return bytes([a ^ b for a, b in zip(bytes_text, derived_key)]).hex()
 
     def generate_hash_secret(self, salt : bytes) -> bytes:
         return hash_secret_raw( # 通过随机盐与密钥生成参数
