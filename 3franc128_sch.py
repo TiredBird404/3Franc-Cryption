@@ -89,7 +89,8 @@ class StringProcessor:
 
     def hex_only(self) -> str: # 清除文本中所有非十六进制的字符
         hex_chars : str = '0123456789abcdef'
-        return ''.join([c for c in self.string.lower() if c in hex_chars])
+        low_text : str = self.string.lower()
+        return ''.join([c for c in low_text if c in hex_chars])
 
     def compress(self) -> str: # 压缩字符串，并输出十六进制文本
         data : bytes = self.string.encode('utf-8')
@@ -114,7 +115,7 @@ class StringProcessor:
         return ''.join([second_char + first_char for second_char, first_char in zip(odd_chars, even_chars)])
     
     def change_line(self, line : int) -> str: # 每隔n个字符换行
-        return ''.join([char + ('\n' if (i + 1) % line == 0 else '') for i, char in enumerate(self.string)])
+        return '\n'.join([self.string[i:i + line] for i in range(0, len(self.string), line)])
 
 class UIManager:
     def __init__(self, root : tk.Tk) -> None:
