@@ -30,11 +30,9 @@ class Cryption:
     
     def decryption(self) -> tuple[bool, str]:
         try:
-            hex_text : str = StringProcessor(self.text).clean_space()
-
-            salt : bytes = bytes.fromhex(hex_text[:self.salt_length*2])
-            mac : str = hex_text[-self.mac_length*2:]
-            encrypted_text : str = hex_text[self.salt_length*2:-self.mac_length*2]
+            salt : bytes = bytes.fromhex(self.text[:self.salt_length*2])
+            mac : str = self.text[-self.mac_length*2:]
+            encrypted_text : str = self.text[self.salt_length*2:-self.mac_length*2]
 
             secret_key : bytes = self.generate_hash_secret(salt)
             hash_key : bytes = hashlib.sha3_256(secret_key).digest()
@@ -194,7 +192,7 @@ class UIManager:
         self.processing_ui(True)
         user_key : str = self.key_entry.get()
         crypted_text : str = self.text_box.get("1.0", "end-1c")
-        cryption_program = Cryption(crypted_text, user_key)
+        cryption_program = Cryption(StringProcessor(crypted_text).clean_space(), user_key)
         cryption_result : tuple[bool,str] = cryption_program.decryption()
         self.processing_ui(False)
 
