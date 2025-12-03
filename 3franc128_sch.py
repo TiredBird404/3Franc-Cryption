@@ -194,7 +194,7 @@ class UIManager:
 
         self.set_text_box(processed_result)
         end_time : float = time.time()
-        messagebox.showinfo("加密完成",f"花费{str(end_time - start_time)}秒")
+        messagebox.showinfo("加密完成",f"总共花费{int((end_time - start_time)*1000)/1000}秒")
 
     def access_decryption(self) -> None:
         start_time : float = time.time()
@@ -208,7 +208,7 @@ class UIManager:
         if cryption_result[0] == True:
             self.set_text_box(cryption_result[1])
             end_time : float = time.time()
-            messagebox.showinfo("解密完成",f"花费{str(end_time - start_time)}秒")
+            messagebox.showinfo("解密完成",f"总共花费{int((end_time - start_time)*1000)/1000}秒")
         else:
             messagebox.showerror("解密失败","密钥、密文不正确。")
 
