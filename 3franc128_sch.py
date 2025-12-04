@@ -192,7 +192,7 @@ class UIManager:
         self.processing_ui(True)
         user_key : str = self.key_entry.get()
         crypted_text : str = self.text_box.get("1.0", "end-1c")
-        cryption_program = Cryption(StringProcessor(crypted_text).clean_space(), user_key)
+        cryption_program = Cryption(StringProcessor(crypted_text.lower()).clean_space(), user_key)
         cryption_result : tuple[bool,str] = cryption_program.decryption()
         self.processing_ui(False)
 
