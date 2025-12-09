@@ -60,7 +60,7 @@ class Cryption:
             secret=self.key.encode('utf-8'),
             salt=salt,
             time_cost=4,
-            memory_cost=64*1024, # KB
+            memory_cost=128*1024, # KB
             parallelism=4,
             hash_len=16, # bytes
             type=Type.ID
