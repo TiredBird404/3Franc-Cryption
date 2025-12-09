@@ -59,9 +59,9 @@ class Cryption:
         return hash_secret_raw( # 通过随机盐与密钥生成参数
             secret=self.key.encode('utf-8'),
             salt=salt,
-            time_cost=2,
+            time_cost=4,
             memory_cost=64*1024, # KB
-            parallelism=2,
+            parallelism=4,
             hash_len=16, # bytes
             type=Type.ID
         )
