@@ -12,8 +12,8 @@ class Cryption:
     def __init__(self, text : str, key : str) -> None:
         self.key : str = StringProcessor(key).clean_space()
         self.text : str = text
-        self.salt_length : int = 16 # 随机盐的字节大小
-        self.mac_length : int = 16 # mac的字节大小
+        self.salt_length : int = 32 # 随机盐的字节大小
+        self.mac_length : int = 32 # mac的字节大小
 
     def encryption(self) -> str:
         salt : bytes = secrets.token_bytes(self.salt_length) # 字节长度
@@ -51,7 +51,7 @@ class Cryption:
     def stream_cipher(text : str, key : bytes) -> str: # 流加密算法输出十六进制值
         bytes_text : bytes = bytes.fromhex(text) # text应是十六进制值
         len_text : int = len(bytes_text)
-        derived_key : bytes = hashlib.shake_128(key).digest(len_text) # 将密钥派生至让每一个字节都有几乎随机的值
+        derived_key : bytes = hashlib.shake_256(key).digest(len_text) # 将密钥派生至让每一个字节都有几乎随机的值
 
         return bytes([a ^ b for a, b in zip(bytes_text, derived_key)]).hex()
 
@@ -60,9 +60,9 @@ class Cryption:
             secret=self.key.encode('utf-8'),
             salt=salt,
             time_cost=4,
-            memory_cost=128*1024, # KB
+            memory_cost=256*1024, # KB
             parallelism=4,
-            hash_len=16, # bytes
+            hash_len=32, # bytes
             type=Type.ID
         )
     
@@ -72,7 +72,7 @@ class Cryption:
             msg=bytes.fromhex(text),
             digestmod=hashlib.sha3_512
         ).digest()
-        return hashlib.shake_128(hmac_result).hexdigest(self.mac_length)
+        return hashlib.shake_256(hmac_result).hexdigest(self.mac_length)
 
 class StringProcessor:
     def __init__(self, string : str) -> None:
@@ -100,7 +100,7 @@ class UIManager:
         self.ui_setup()
 
     def ui_setup(self) -> None:
-        self.root.title("3Franc-128bits")
+        self.root.title("3Franc-256bits")
         self.root.geometry("800x640")
         self.root.resizable(False,False)
         self.root.option_add("*Font", ("Noto Sans Mono",14))
