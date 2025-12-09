@@ -190,7 +190,7 @@ class UIManager:
             messagebox.showerror("解密失败","密钥、密文不正确。")
 
     def generate_key(self) -> None:
-        new_key : str = secrets.token_hex(16) # 字节长度
+        new_key : str = secrets.token_hex(32) # 字节长度
         self.key_entry.delete(0,tk.END)
         self.key_entry.insert(0,new_key)
 
