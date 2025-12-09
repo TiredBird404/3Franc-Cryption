@@ -20,8 +20,7 @@ class Cryption:
         secret_key : bytes = self.generate_hash_secret(salt)
 
         compressed_text : str = StringProcessor(self.text).compress()
-        shuffled_text : str = StringProcessor(compressed_text).intersect()
-        encrypted_text : str = self.stream_cipher(shuffled_text, secret_key)
+        encrypted_text : str = self.stream_cipher(compressed_text, secret_key)
         
         hash_key : bytes = hashlib.sha3_256(secret_key).digest()
         mac : str = self.generate_mac(encrypted_text, hash_key)
@@ -42,8 +41,7 @@ class Cryption:
                 return False, ''
 
             decrypted_text : str = self.stream_cipher(encrypted_text, secret_key)
-            unshuffled_text : str = StringProcessor(decrypted_text).reverse_intersect()
-            decompressed_text : str = StringProcessor(unshuffled_text).decompress()
+            decompressed_text : str = StringProcessor(decrypted_text).decompress()
 
             return True, decompressed_text
         except:
@@ -62,7 +60,7 @@ class Cryption:
             secret=self.key.encode('utf-8'),
             salt=salt,
             time_cost=4,
-            memory_cost=256*1024, # KB
+            memory_cost=128*1024, # KB
             parallelism=4,
             hash_len=16, # bytes
             type=Type.ID
@@ -92,18 +90,6 @@ class StringProcessor:
         data = bytes.fromhex(self.string)
         decompressed_data : bytes = zlib.decompress(data)
         return decompressed_data.decode("utf-8")
-    
-    def intersect(self) -> str: # 将文本交叉。例：abcdef -> bdface
-        odd_chars : str = self.string[1::2]
-        even_chars : str = self.string[::2]
-        return odd_chars + even_chars
-    
-    def reverse_intersect(self) -> str: # 该逆向适用于偶数长度的文本，因为导入的十六进制字符串是bytes长度*2，所以其必然是偶数
-        text : str = self.string
-        half_len : int = len(text) // 2
-        even_chars : str = text[:half_len]
-        odd_chars : str = text[half_len:]
-        return ''.join([second_char + first_char for second_char, first_char in zip(odd_chars, even_chars)])
     
     def change_line(self, line : int) -> str: # 每隔n个字符换行
         return '\n'.join([self.string[i:i + line] for i in range(0, len(self.string), line)])
