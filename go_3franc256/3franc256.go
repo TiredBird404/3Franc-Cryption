@@ -83,7 +83,7 @@ func cipher(text []byte, key []byte) []byte {
 }
 
 func generateSecretKey(key []byte, salt []byte) []byte {
-	return argon2.IDKey(key, salt, 4, 256*1024, 4, 32)
+	return argon2.IDKey(key, salt, 2, 64*1024, 2, 32)
 }
 
 func generateMac(key []byte, text []byte) []byte {
