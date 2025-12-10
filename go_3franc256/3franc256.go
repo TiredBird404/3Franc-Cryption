@@ -87,7 +87,7 @@ func generateSecretKey(key []byte, salt []byte) []byte {
 }
 
 func generateMac(key []byte, text []byte) []byte {
-	hashSha3 := sha3.New256()
+	hashSha3 := sha3.New512()
 	hashSha3.Write(key)
 	var hashKey []byte = hashSha3.Sum(nil)
 
