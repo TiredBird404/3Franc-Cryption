@@ -22,7 +22,7 @@ class Cryption:
         compressed_text : str = StringProcessor(self.text).compress()
         encrypted_text : str = self.stream_cipher(compressed_text, secret_key)
         
-        hash_key : bytes = hashlib.sha3_256(secret_key).digest()
+        hash_key : bytes = hashlib.sha3_512(secret_key).digest()
         mac : str = self.generate_mac(encrypted_text, hash_key)
 
         return salt.hex() + encrypted_text + mac
@@ -34,7 +34,7 @@ class Cryption:
             encrypted_text : str = self.text[self.salt_length*2:-self.mac_length*2]
 
             secret_key : bytes = self.generate_hash_secret(salt)
-            hash_key : bytes = hashlib.sha3_256(secret_key).digest()
+            hash_key : bytes = hashlib.sha3_512(secret_key).digest()
             check_mac : str = self.generate_mac(encrypted_text, hash_key)
 
             if not hmac.compare_digest(check_mac,mac):
