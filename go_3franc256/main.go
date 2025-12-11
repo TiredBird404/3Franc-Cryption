@@ -88,11 +88,16 @@ func encryptionOption(key []byte) error {
 		return err
 	}
 	fmt.Println("\nProcessing...")
-	encryptionResult, err := Encryption(fileContent, key)
+	c := make(chan []byte)
+	e := make(chan error)
+	go getEncryptionResult(c, e)
+	c <- fileContent
+	c <- key
+	err = <-e
 	if err != nil {
 		return err
 	}
-	var hexResult string = hex.EncodeToString(encryptionResult)
+	var hexResult string = hex.EncodeToString(<-c)
 	var resultContent string = insertNewlineEvery64Bytes(hexResult)
 	err = saveFile(savePath, fileName, []byte(resultContent), "Encrypted")
 	if err != nil {
@@ -116,15 +121,32 @@ func decryptionOption(key []byte) error {
 	if err != nil {
 		return err
 	}
-	decryptionResult, err := Decryption(contentToByte, key)
+	c := make(chan []byte)
+	e := make(chan error)
+	go getDecryptionResult(c, e)
+	c <- contentToByte
+	c <- key
+	err = <-e
 	if err != nil {
 		return err
 	}
-	err = saveFile(savePath, fileName, decryptionResult, "Decrypted")
+	err = saveFile(savePath, fileName, <-c, "Decrypted")
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func getEncryptionResult(c chan []byte, e chan error) {
+	encryptionResult, err := Encryption(<-c, <-c)
+	e <- err
+	c <- encryptionResult
+}
+
+func getDecryptionResult(c chan []byte, e chan error) {
+	decryptionResult, err := Decryption(<-c, <-c)
+	e <- err
+	c <- decryptionResult
 }
 
 func getFileContent() (string, []byte, error) {
