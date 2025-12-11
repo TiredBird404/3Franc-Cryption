@@ -25,9 +25,13 @@ func Encryption(userText []byte, key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	encryptedText := cipher(compressedText, secretKey)
+	c := make(chan []byte)
+	go cipher(c)
+	c <- compressedText
+	c <- secretKey
+	var encryptedText []byte = <-c
 
-	var mac []byte = generateMac(secretKey, []byte(encryptedText))
+	var mac []byte = generateMac(secretKey, encryptedText)
 
 	var buffer bytes.Buffer
 	buffer.Write(salt)
@@ -54,9 +58,11 @@ func Decryption(userText []byte, key []byte) ([]byte, error) {
 		return nil, errors.New("decryption failed")
 	}
 
-	var decryptedText []byte = cipher(encryptedText, secretKey)
-
-	result, err := decompressData(decryptedText)
+	c := make(chan []byte)
+	go cipher(c)
+	c <- encryptedText
+	c <- secretKey
+	result, err := decompressData(<-c) // c : decrypted data
 	if err != nil {
 		return nil, err
 	}
@@ -73,13 +79,15 @@ func GetRandomByte() ([]byte, error) {
 	return b, nil
 }
 
-func cipher(text []byte, key []byte) []byte {
+func cipher(c chan []byte) {
+	var text []byte = <-c
+	var key []byte = <-c
 	var derivedKey []byte = generateShake(key, len(text))
 	var result []byte = make([]byte, len(text))
 	for i := range len(text) {
 		result[i] = text[i] ^ derivedKey[i]
 	}
-	return result
+	c <- result
 }
 
 func generateSecretKey(key []byte, salt []byte) []byte {
